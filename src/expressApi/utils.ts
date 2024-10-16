@@ -50,7 +50,7 @@ export class ExpressApiUtils {
         data
       }))
     } catch (error: any) {
-      res.status(500).send(error.message)
+      res.status(500).send(error.message ?? error)
     }
   }
 
@@ -65,7 +65,7 @@ export class ExpressApiUtils {
       const result: IApiGetResult<T[]> | undefined = await args.dataSourceBuilder().read(opt)
       res.send(result)
     } catch (error: any) {
-      res.status(500).send(error.message)
+      res.status(500).send(error.message ?? error)
     }
   }
 
@@ -77,11 +77,12 @@ export class ExpressApiUtils {
   ) => async (req: Request<core.ParamsDictionary, any, any, core.Query, Record<string, any>>, res: Response<any, Record<string, any>>) => {
     try {
       const data = req.body as T
-      res.send(await args.dataSourceBuilder().update({
+      let result = await args.dataSourceBuilder().update({
         data
-      }))
+      })
+      res.send(result)
     } catch (error: any) {
-      res.status(500).send(error.message)
+      res.status(500).send(error.message ?? error)
     }
   }
 
@@ -110,7 +111,7 @@ export class ExpressApiUtils {
         deletedCount: deleteReponse
       })
     } catch (error: any) {
-      res.status(500).send(error.message)
+      res.status(500).send(error.message ?? error)
     }
   }
 

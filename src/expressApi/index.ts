@@ -39,7 +39,10 @@ export class ExpressApi {
   constructor(options: ExpressApiInitOptions) {
     console.log('Api.init()');
 
-    this.expressApp.use(cors())
+    this.expressApp.use(cors({
+      origin: '*',
+      credentials: true,
+    }))
     this.expressApp.use(express.json({
       limit: '5mb'
     }))
