@@ -1,11 +1,8 @@
 {
   "keywords": [
-    "database",
-    "db",
-    "mongoose",
-    "sequelize",
-    "redis",
-    "extension"
+    "express",
+    "api",
+    "socket"
   ],
   "version": "0.1.0-3",
   "license": "MIT",
