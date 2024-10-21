@@ -1,7 +1,7 @@
 import express, { Request, Response } from 'express'
 import * as core from 'express-serve-static-core'
 import { IApiGetResult } from 'fwork-jsts-common/src/api'
-import { IWhereOptions } from 'fwork-jsts-db'
+import { IWhereOptions } from 'fwork-jsts-db/src'
 import { IDbBulkCreateOptions, IDbClientDataSource, IDbCreateOptions, IDbDeleteByKeyOptions, IDbDeleteOptions, IDbGetOptions, IDbUpdateOptions } from 'fwork-jsts-db/src/dbClient'
 import { FilterQuery } from 'mongoose'
 import { WhereOptions } from 'sequelize'
