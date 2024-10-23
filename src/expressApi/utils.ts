@@ -1,41 +1,31 @@
 import express, { Request, Response } from 'express'
-import * as core from 'express-serve-static-core'
-import { IApiGetResult } from 'fwork-jsts-common/src/api'
-import { IWhereOptions } from 'fwork-jsts-db/src'
+import { ApiRequestDeleteOptions, ApiRequestGetOptions, ApiRequestPostOptions, ApiRequestPutOptions, ApiResponseDeleteData, ApiResponseGetListData, ApiResponsePostData, ApiResponsePutData } from 'fwork-jsts-common/src/api'
+import { Where } from 'fwork-jsts-common/src/api/query'
 import { IDbBulkCreateOptions, IDbClientDataSource, IDbCreateOptions, IDbDeleteByKeyOptions, IDbDeleteOptions, IDbGetOptions, IDbUpdateOptions } from 'fwork-jsts-db/src/dbClient'
-import { FilterQuery } from 'mongoose'
-import { WhereOptions } from 'sequelize'
 import { HttpMethods } from '..'
 
 export class ExpressApiUtils {
-  static getOptions = <T, TWhereOptions extends WhereOptions<T> | FilterQuery<T> | IWhereOptions<T>>(req: any): IDbGetOptions => {
-    const where: TWhereOptions | undefined = req.query.where ? (JSON.parse(req.query.where.toString())) as TWhereOptions : undefined
-    const sort: any = req.query.sort ? JSON.parse(req.query.sort) : null
-    const select: any = req.query.select
-    const exclude: any = req.query.exclude
-    const nested: any = req.query.nested
-    const page: number | undefined = req.query.page ? Number(req.query.page) : undefined
-    const skip: number | undefined = req.query.skip ? Number(req.query.skip) : undefined
-    const limit: number | undefined = req.query.limit ? Number(req.query.limit) : undefined
-
-    return {
-      where,
-      sort,
-      select,
-      exclude,
-      nested,
-      page,
-      skip,
-      limit,
+  static requestGetOptions = <T, TWhere extends Where<T>>(req: Request): ApiRequestGetOptions<T, TWhere> => {
+    const result: ApiRequestGetOptions<T, TWhere> = {
+      where: req.query.where ? (JSON.parse(req.query.where.toString())) as TWhere : undefined,
+      sort: req.query.sort ? JSON.parse((req.query as any).sort) : null,
+      select: req.query.select,
+      exclude: req.query.exclude,
+      nested: req.query.nested,
+      page: req.query.page ? Number(req.query.page) : undefined,
+      skip: req.query.skip ? Number(req.query.skip) : undefined,
+      limit: req.query.limit ? Number(req.query.limit) : undefined,
     }
+
+    return result
   }
 
-  static deleteOptions = <T, TWhereOptions extends WhereOptions<T> | FilterQuery<T> | IWhereOptions<T>>(req: any) => {
-    const where: TWhereOptions | undefined = req.body.where ? (JSON.parse(req.body.where.toString())) as TWhereOptions : undefined
-
-    return {
-      where,
+  static requestDeleteOptions = <T, TWhere extends Where<T>>(req: Request): ApiRequestDeleteOptions<T, TWhere> => {
+    const result: ApiRequestDeleteOptions<T, TWhere> = {
+      where: req.body.where ? (JSON.parse(req.body.where.toString())) as TWhere : undefined
     }
+
+    return result
   }
 
   static initPostRoute = <T>(
@@ -43,26 +33,27 @@ export class ExpressApiUtils {
       dataSourceBuilder: () => IDbClientDataSource<T, any,
         IDbBulkCreateOptions<T>, IDbCreateOptions<T>, IDbGetOptions, IDbUpdateOptions<T>, IDbDeleteOptions, IDbDeleteByKeyOptions<any>>
     }
-  ) => async (req: Request<core.ParamsDictionary, any, any, core.Query, Record<string, any>>, res: Response<any, Record<string, any>>) => {
+  ) => async (req: Request, res: Response) => {
     try {
-      const data = req.body as T
-      res.send(await args.dataSourceBuilder().create({
-        data
-      }))
+      const opt = req.body as ApiRequestPostOptions<T>
+      const result: ApiResponsePostData<T> | undefined = await args.dataSourceBuilder().create({
+        data: opt
+      })
+      res.send(result)
     } catch (error: any) {
       res.status(500).send(error.message ?? error)
     }
   }
 
-  static initGetRoute = <T, TWhereOptions extends WhereOptions<T> /**sequelize */ | FilterQuery<T> /**mongoose */ | IWhereOptions<T> /**dbclient */>(
+  static initGetRoute = <T, TWhere extends Where<T>>(
     args: {
       dataSourceBuilder: () => IDbClientDataSource<T, any,
         IDbBulkCreateOptions<T>, IDbCreateOptions<T>, IDbGetOptions, IDbUpdateOptions<T>, IDbDeleteOptions, IDbDeleteByKeyOptions<any>>
     }
-  ) => async (req: Request<core.ParamsDictionary, any, any, core.Query, Record<string, any>>, res: Response<any, Record<string, any>>) => {
+  ) => async (req: Request, res: Response) => {
     try {
-      const opt = ExpressApiUtils.getOptions<T, TWhereOptions>(req)
-      const result: IApiGetResult<T[]> | undefined = await args.dataSourceBuilder().read(opt)
+      const opt = ExpressApiUtils.requestGetOptions<T, TWhere>(req)
+      const result: ApiResponseGetListData<T> | undefined = await args.dataSourceBuilder().read(opt)
       res.send(result)
     } catch (error: any) {
       res.status(500).send(error.message ?? error)
@@ -74,11 +65,11 @@ export class ExpressApiUtils {
       dataSourceBuilder: () => IDbClientDataSource<T, any,
         IDbBulkCreateOptions<T>, IDbCreateOptions<T>, IDbGetOptions, IDbUpdateOptions<T>, IDbDeleteOptions, IDbDeleteByKeyOptions<any>>
     }
-  ) => async (req: Request<core.ParamsDictionary, any, any, core.Query, Record<string, any>>, res: Response<any, Record<string, any>>) => {
+  ) => async (req: Request, res: Response) => {
     try {
-      const data = req.body as T
-      let result = await args.dataSourceBuilder().update({
-        data
+      const opt = req.body as ApiRequestPutOptions<T>
+      const result: ApiResponsePutData<T> | undefined = await args.dataSourceBuilder().update({
+        data: opt
       })
       res.send(result)
     } catch (error: any) {
@@ -86,18 +77,18 @@ export class ExpressApiUtils {
     }
   }
 
-  static initDeleteRoute = <T, TWhereOptions extends WhereOptions<T> /**sequelize */ | FilterQuery<T> /**mongoose */ | IWhereOptions<T> /**dbclient */>(
+  static initDeleteRoute = <T, TWhere extends Where<T>>(
     args: {
       dataSourceBuilder: () => IDbClientDataSource<T, any,
         IDbBulkCreateOptions<T>, IDbCreateOptions<T>, IDbGetOptions, IDbUpdateOptions<T>, IDbDeleteOptions, IDbDeleteByKeyOptions<any>>,
     }
-  ) => async (req: Request<core.ParamsDictionary, any, any, core.Query, Record<string, any>>, res: Response<any, Record<string, any>>) => {
+  ) => async (req: Request, res: Response) => {
     try {
       // req.params[key] http://host:port/path/key
       // req.query[key] http://host:port/path?key=value
       const ds = args.dataSourceBuilder()
       const keyValue = req.params['key'] || req.query['key']
-      const opt = ExpressApiUtils.deleteOptions<T, TWhereOptions>(req)
+      const opt = ExpressApiUtils.requestDeleteOptions<T, TWhere>(req)
       if (keyValue && opt.where) {
         res.status(400).send()
         return
@@ -107,15 +98,17 @@ export class ExpressApiUtils {
           [ds.keyName]: keyValue
         } : opt.where
       })
-      res.status(200).send({
+
+      const result: ApiResponseDeleteData = {
         deletedCount: deleteReponse
-      })
+      }
+      res.status(200).send(result)
     } catch (error: any) {
       res.status(500).send(error.message ?? error)
     }
   }
 
-  static initRoutes = <T, TGetOptions extends WhereOptions<T> | FilterQuery<T>, TDeleteOptions extends WhereOptions<T> | FilterQuery<T>>
+  static initRoutes = <T, TGetWhere extends Where<T>, TDeleteWhere extends Where<T>>
     (args: {
       path: string,
       dataSourceBuilder: () => IDbClientDataSource<T, any,
@@ -144,7 +137,7 @@ export class ExpressApiUtils {
       }))
 
     if (get)
-      route.get(args.path, ExpressApiUtils.initGetRoute<T, TGetOptions>({
+      route.get(args.path, ExpressApiUtils.initGetRoute<T, TGetWhere>({
         dataSourceBuilder: args.dataSourceBuilder
       }))
 
@@ -154,7 +147,7 @@ export class ExpressApiUtils {
       }))
 
     if (remove) {
-      route.delete(`${args.path}/:key`, ExpressApiUtils.initDeleteRoute<T, TDeleteOptions>({
+      route.delete(`${args.path}/:key`, ExpressApiUtils.initDeleteRoute<T, TDeleteWhere>({
         dataSourceBuilder: args.dataSourceBuilder,
       }))
     }
