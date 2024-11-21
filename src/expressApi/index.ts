@@ -23,7 +23,7 @@ process.on('unhandledRejection', (reason, promise) => {
 
 export interface ExpressApiInitOptions {
   middlewares?: any[] | undefined,
-  onApiStart?: () => void | undefined
+  onApiStart?: (() => Promise<void> | void) | undefined
 }
 
 export interface ExpressSocketApiInitOptions extends ExpressApiInitOptions {
@@ -32,7 +32,7 @@ export interface ExpressSocketApiInitOptions extends ExpressApiInitOptions {
 
 export class ExpressApi {
   expressApp = express()
-  onApiStart?: () => void
+  onApiStart?: (() => Promise<void> | void) | undefined
   serverHttp?: http.Server<typeof http.IncomingMessage, typeof http.ServerResponse>
   serverHttps?: https.Server<typeof http.IncomingMessage, typeof http.ServerResponse>
 
@@ -79,7 +79,7 @@ export class ExpressApi {
       this.onApiStart = options.onApiStart
   }
 
-  start(args?: {
+  async start(args?: {
     callBack?: () => void | undefined
   }) {
     console.log(`env: ${JSON.stringify(expressApiEnv, null, 4)}`)
@@ -102,7 +102,7 @@ export class ExpressApi {
       args.callBack()
 
     if (this.onApiStart)
-      this.onApiStart()
+      await this.onApiStart()
   }
 
   stop() {
