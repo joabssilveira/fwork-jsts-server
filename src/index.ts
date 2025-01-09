@@ -1,6 +1,11 @@
 import * as fs from 'fs';
 import path from 'path'
 
+import { ExpressApi, ExpressApiInitOptions, ExpressSocketApi, ExpressSocketApiInitOptions } from './expressApi'
+import { IExpressApiSettings, expressApiEnv } from './expressApi/env'
+import { ExpressApiUtils } from './expressApi/utils'
+import { expressWebproxyRoutes } from './expressApi/webproxy'
+
 export enum HttpMethods {
   post,
   get,
@@ -93,5 +98,8 @@ export class FileUtils {
 }
 
 export {
-  
+  ExpressApi, ExpressApiInitOptions, ExpressSocketApi, ExpressSocketApiInitOptions,
+  IExpressApiSettings, expressApiEnv,
+  ExpressApiUtils,
+  expressWebproxyRoutes,
 }
