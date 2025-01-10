@@ -5,10 +5,17 @@
     "types"
   ],
   "compilerOptions": {
-    "module": "esnext",
+    "module": "CommonJS",
+    // O que o parâmetro "lib" faz?
+    // Ele define quais bibliotecas padrão do TypeScript devem ser incluídas no processo de compilação.
+    // "DOM" adiciona tipos e APIs relacionadas ao navegador (ex.: document, window, etc.).
+    // "ESNext" inclui as últimas funcionalidades do JavaScript (como Promise, Map, Set, etc.).
+    // Posso manter "DOM" e "ESNext"?
+    // Sim, se o código usa APIs do navegador: Por exemplo, se você interage com o DOM ou utiliza bibliotecas relacionadas ao navegador, deve manter "DOM".
+    // Não, se o código é exclusivo para Node.js: Se o código não usa APIs do navegador, pode ser melhor ajustar para evitar confusões, pois "DOM" inclui tipos que não existem em Node.js (ex.: window).
     "lib": [
-      "dom",
-      "esnext"
+      "DOM",
+      "ESNext"
     ],
     "importHelpers": true,
     // output .d.ts declaration files for consumers
@@ -38,10 +45,9 @@
     // `tsdx build` ignores this option, but it is commonly used when type-checking separately with `tsc`
     // "noEmit": true,
     "noEmit": false,
-    "target": "esnext",
-    "outDir": "./dist",
-  },
-  "exclude": [
-    "node_modules"
-  ],
+
+    "outDir": "./dist/cjs",
+    "declarationDir": "./dist/types",
+    "target": "es2021",
+  }
 }
