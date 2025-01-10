@@ -31,9 +31,9 @@
 		"socket"
 	],
 	"license": "MIT",
-	"main": "dist/index.js",
-	"module": "dist/esm/index.js",
-	"types": "dist/types/index.d.ts",
+	"main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "types": "dist/types/index.d.ts",
 	"name": "fwork-jsts-server",
 	"prettier": {
 		"printWidth": 80,
