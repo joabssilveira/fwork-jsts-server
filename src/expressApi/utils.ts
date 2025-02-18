@@ -1,7 +1,6 @@
 import express, { Request, Response } from 'express'
-import { ApiRequestDeleteOptions, ApiRequestGetOptions, ApiRequestPostOptions, ApiRequestPutOptions, ApiResponseDeleteData, ApiResponseGetListData, ApiResponsePostData, ApiResponsePutData } from 'fwork-jsts-common/src/api'
-import { Where } from 'fwork-jsts-common/src/api/query'
-import { IDbBulkCreateOptions, IDbClientDataSource, IDbCreateOptions, IDbDeleteByKeyOptions, IDbDeleteOptions, IDbGetOptions, IDbUpdateOptions } from 'fwork-jsts-db/src/dbClient'
+import { Where, ApiRequestDeleteOptions, ApiRequestGetOptions, ApiRequestPostOptions, ApiRequestPutOptions, ApiResponseDeleteData, ApiResponseGetListData, ApiResponsePostData, ApiResponsePutData } from 'fwork-jsts-common'
+import { IDbBulkCreateOptions, IDbClientDataSource, IDbCreateOptions, IDbDeleteByKeyOptions, IDbDeleteOptions, IDbGetOptions, IDbUpdateOptions } from 'fwork-jsts-db'
 import { HttpMethods } from '..'
 
 export class ExpressApiUtils {
